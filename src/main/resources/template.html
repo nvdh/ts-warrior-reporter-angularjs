@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang='en' ng-app='ts-warrior'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<meta name='description' content='AngularJS Timesheet Report'>
+<meta name='author' content='ts-warrior-reporter-angularjs'>
+<title>Report</title>
+<link href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
+<link href='http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' rel='stylesheet' />
+<link href='styles.css' rel='stylesheet' />
+</head>
+<body class='boxed-page'>
+	<div class='container'>
+		<section id='container' class='' ng-controller="Controller"
+			ng-init="loadData()">
+			<section class='wrapper'>
+				<section>
+					<div class='panel panel-primary'>
+						<header class='panel-heading'>{{fetchResult.fetchedMonth}}</header>
+						<div class='panel-body'>
+							<table class='table table-hover'>
+								<thead>
+									<tr>
+										<th style='width: 100px;'>{{fetchResult.fetchedMonth | date : 'EEE'}}</th>
+										<th style='width: 180px;'>Date</th>
+										<th style='width: 180px;'>Ticks</th>
+										<th style='width: 180px;'>Manual</th>
+										<th style='width: 180px;'>Prestation</th>
+										<th style='width: 180px;'>Needed</th>
+										<th style='width: 180px;'>Difference</th>
+										<th style='width: 180px;'>Week Total</th>
+										<th style='width: 250px;'>Comment</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="prestation in fetchResult.prestations">
+										<td ng-class="{lastDayOfWeek : prestation.lastDayOfWeek}">{{prestation.day | date : 'EEE'}}</td>
+										<td ng-class="{lastDayOfWeek : prestation.lastDayOfWeek}">{{prestation.day | date : 'mediumDate'}}</td>
+										<td ng-class="{lastDayOfWeek : prestation.lastDayOfWeek}"><span ng-repeat="tickTime in prestation.tickTimes">
+												{{tickTime}}
+											</span>
+										</td>
+										<td ng-class="{lastDayOfWeek : prestation.lastDayOfWeek}"><span ng-repeat="manualRegistration in prestation.manualRegistrations">
+												{{manualRegistration}}
+											</span>
+										</td>
+										<td ng-class="{negative: prestation.duration < 0, lastDayOfWeek : prestation.lastDayOfWeek}">{{duration(prestation.duration)}}</td>
+										<td ng-class="{negative: prestation.neededDuration < 0, lastDayOfWeek : prestation.lastDayOfWeek}">{{duration(prestation.neededDuration)}}</td>
+										<td ng-class="{negative: prestation.overtime < 0, lastDayOfWeek : prestation.lastDayOfWeek}">{{duration(prestation.overtime)}}</td>
+										<td ng-class="{negative: prestation.weekOvertime < 0, lastDayOfWeek : prestation.lastDayOfWeek}">{{nonZeroDuration(prestation.weekOvertime)}}</td>
+										<td ng-class="{lastDayOfWeek : prestation.lastDayOfWeek}"><div contenteditable="true">{{prestation.comments}}</div></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class='row'>
+								<div class='col-lg-4 pull-right'>{{timeToGoHomeLabel(fetchResult.totalOvertime, fetchResult.timeToGoHome)}}</div>
+							</div>
+							<div class='row'>
+								<div class='col-lg-4 timesheet-block pull-right'>
+									<ul class='unstyled amounts'>
+										<li><strong>Total: </strong>{{duration(fetchResult.totalTime)}}</li>
+										<li><strong>Overtime: </strong>{{duration(fetchResult.totalOvertime)}}</li>
+									</ul>
+								</div>
+							</div>
+							<div class='text-center timesheet-btn'>
+								<a class='btn btn-danger btn-lg'
+									onclick='javascript:window.print();'> <i
+									class='fa fa-print'></i> Print
+								</a>
+							</div>
+						</div>
+					</div>
+				</section>
+			</section>
+			<footer class='site-footer'>
+				<div class='text-center'>
+					Created at {{fetchResult.fetchDate}} <a href='#' class='go-top'> <i
+						class='fa fa-angle-up'></i>
+					</a>
+				</div>
+			</footer>
+		</section>
+	</div>
+	<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'></script>
+	<script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	<script src="ts.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			var json = %JSON%;
+			angular.element('#container').scope().setJSON(json);
+			angular.element('#container').scope().$apply();
+		});
+	</script>
+</body>
+</html>
